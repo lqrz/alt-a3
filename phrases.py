@@ -5,6 +5,7 @@ from collections import Counter
 import time
 from collections import defaultdict
 import sys
+from itertools import chain
 
 def satC1(de_pos, en_pos, en_alignment_dict):
     '''
@@ -15,17 +16,32 @@ def satC1(de_pos, en_pos, en_alignment_dict):
     :return: whether it satisfies the condition
     '''
 
-    check = True
+    # return len(map(lambda e:set(en_alignment_dict[e])-set(de_pos), en_pos)) == 0
+
+    # min_one = False
     min_one = False
 
     # alignments associated with en positions
     for en in en_pos:
-        # de positions asociated with the english word
+        # de positions associated with the english word
         for a in en_alignment_dict[en]:
             min_one = True
-            check = check and (True if a in de_pos else False)
+            if a not in de_pos:
+                return False
 
-    return check and min_one
+    return min_one
+
+    # check = True
+    # min_one = False
+    #
+    # # alignments associated with en positions
+    # for en in en_pos:
+    #     # de positions asociated with the english word
+    #     for a in en_alignment_dict[en]:
+    #         min_one = True
+    #         check = check and (True if a in de_pos else False)
+    #
+    # return check and min_one
 
 def satC2(de_pos, en_pos, de_alignment_dict):
     '''
@@ -36,16 +52,27 @@ def satC2(de_pos, en_pos, de_alignment_dict):
     :return: whether it satisfies the condition
     '''
 
-    check = True
     min_one = False
 
     # alignments associated with en positions
     for de in de_pos:
         for a in de_alignment_dict[de]:
             min_one = True
-            check = check and (True if a in en_pos else False)
+            if a not in en_pos:
+                return False
 
-    return check and min_one
+    return min_one
+
+    # check = True
+    # min_one = False
+    #
+    # # alignments associated with en positions
+    # for de in de_pos:
+    #     for a in de_alignment_dict[de]:
+    #         min_one = True
+    #         check = check and (True if a in en_pos else False)
+    #
+    # return check and min_one
 
 def alignments2Words(positions, de_sent, en_sent):
     '''
