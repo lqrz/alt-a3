@@ -248,8 +248,8 @@ def extract_phrases(line_en, line_de, line_align, max_phrase_len):
 
                 # update_phrase_counts(translation[0], translation[1])
 
-    print('Tuned elapsed time: ', time.time() - start)
-    print 'Total nr of extracted phrases: ', len(phrases)
+    # print('Tuned elapsed time: ', time.time() - start)
+    # print 'Total nr of extracted phrases: ', len(phrases)
 
     return phrases_str, phrases, data_alignments, de_alignment_dict, en_alignment_dict
 
