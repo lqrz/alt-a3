@@ -165,7 +165,7 @@ if __name__=='__main__':
     f_out.close()
 
     print 'Pickling structures'
-    pickle.dump(counts, open('counts.p', 'wb'))
+    # pickle.dump(counts, open('counts.p', 'wb'))
     pickle.dump(total_lr, open('total_lr.p', 'wb'))
     pickle.dump(total_rl, open('total_rl.p', 'wb'))
 
