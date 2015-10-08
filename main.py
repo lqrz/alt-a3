@@ -8,6 +8,8 @@ import sys
 from collections import defaultdict
 from collections import Counter
 from operator import div
+import pickle
+
 
 def dec(f):
     def helper(a, b):
@@ -120,7 +122,6 @@ if __name__=='__main__':
             n_rl_word_discontinuous_l = len([(p_de,p_en) for p_de,p_en in rl_word_discontinuous if pos_de[0] > p_de[-1]])
             n_rl_word_discontinuous_r = len(rl_word_discontinuous) - n_rl_word_discontinuous_l
 
-            #TODO: update counters
             phrase_str = alignments2Words((pos_de, pos_en), line_de.strip().split(), line_en.strip().split())
 
             # update counter lr
@@ -162,5 +163,10 @@ if __name__=='__main__':
         f_out.write(' '.join([phrase[0],sep,phrase[1],sep]+probs_str+['\n']))
 
     f_out.close()
+
+    print 'Pickling structures'
+    pickle.dump(counts, open('counts.p', 'wb'))
+    pickle.dump(total_lr, open('total_lr.p', 'wb'))
+    pickle.dump(total_rl, open('total_rl.p', 'wb'))
 
     print 'Elapsed time: ', time.time()-start
