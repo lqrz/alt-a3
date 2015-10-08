@@ -152,10 +152,10 @@ if __name__=='__main__':
         p2 = dec(div)(counts[phrase]['lr']['s'], float(total_lr[phrase]))
         p3 = dec(div)(counts[phrase]['lr']['dl'], float(total_lr[phrase]))
         p4 = dec(div)(counts[phrase]['lr']['dr'], float(total_lr[phrase]))
-        p5 = dec(div)(counts[phrase]['rl']['m'], float(total_lr[phrase]))
-        p6 = dec(div)(counts[phrase]['rl']['s'], float(total_lr[phrase]))
-        p7 = dec(div)(counts[phrase]['rl']['dl'], float(total_lr[phrase]))
-        p8 = dec(div)(counts[phrase]['rl']['dr'], float(total_lr[phrase]))
+        p5 = dec(div)(counts[phrase]['rl']['m'], float(total_rl[phrase]))
+        p6 = dec(div)(counts[phrase]['rl']['s'], float(total_rl[phrase]))
+        p7 = dec(div)(counts[phrase]['rl']['dl'], float(total_rl[phrase]))
+        p8 = dec(div)(counts[phrase]['rl']['dr'], float(total_rl[phrase]))
 
         probs_str = map(str,[p1,p2,p3,p4,p5,p6,p7,p8])
 
