@@ -207,7 +207,7 @@ def extract_phrases(line_en, line_de, line_align, max_phrase_len):
     phrases = []
     phrases_str = set()
 
-    print 'Extracting phrases for sentence: %s\n' %line_en
+    # print 'Extracting phrases for sentence: %s\n' %line_en
 
     # read english line
     en_sent = line_en.strip().split()  # whitespace tokenization
