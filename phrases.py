@@ -207,6 +207,9 @@ def extract_phrases(line_en, line_de, line_align, max_phrase_len):
     phrases = []
     phrases_str = set()
 
+    phrases_begin = defaultdict(list)
+    phrases_end = defaultdict(list)
+
     # print 'Extracting phrases for sentence: %s\n' %line_en
 
     # read english line
@@ -246,12 +249,15 @@ def extract_phrases(line_en, line_de, line_align, max_phrase_len):
                 data_alignments[(translation[0], translation[1])].append(
                     (de_phrase_alignments, en_phrase_alignments))
 
+                phrases_begin[min(en_cand)].append((de_f, en_cand))
+                phrases_end[max(en_cand)].append((de_f, en_cand))
+
                 # update_phrase_counts(translation[0], translation[1])
 
     # print('Tuned elapsed time: ', time.time() - start)
     # print 'Total nr of extracted phrases: ', len(phrases)
 
-    return phrases_str, phrases, data_alignments, de_alignment_dict, en_alignment_dict
+    return phrases_str, phrases, data_alignments, de_alignment_dict, en_alignment_dict, phrases_begin, phrases_end
 
 
 if __name__ == '__main__':
