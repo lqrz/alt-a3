@@ -55,7 +55,8 @@ if __name__=='__main__':
     print 'Iterating sentences'
     # iterate sentences
     for i, line_en in enumerate(f_en):
-        print 'Sentence %d', i
+        if (i+1) % 1000 == 0:
+            print 'Sentence processed: ', i+1
         line_de = f_de.readline()
         line_align = f_align.readline()
         phrases_str, phrases, data_alignments, de_alignment_dict, en_alignment_dict = extract_phrases(line_en, line_de, line_align, max_phrase_len)
