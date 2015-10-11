@@ -117,11 +117,15 @@ if __name__=='__main__':
         line_align = f_align.readline()
         phrases_str, phrases, data_alignments, de_alignment_dict, en_alignment_dict, phrases_begin, phrases_end = extract_phrases(line_en, line_de, line_align, max_phrase_len)
 
-        for pos_de, pos_en in phrases:
+        for i,(pos_de, pos_en) in enumerate(phrases):
+
+            if i == 29:
+                print '29'
 
             # get possible next phrase
             # nexts = [(p_de,p_en) for p_de,p_en in phrases if p_en[0] == pos_en[-1]+1] # for l-r
-            nexts = phrases_begin[pos_en[-1]+1] # for l-r
+            # nexts = phrases_begin[pos_en[-1]+1] # for l-r
+            nexts = [t for t in phrases_begin[pos_en[-1]+1] if pos_de[-1] not in t[0]] # for l-r
 
             # lr_phrase_monotone = [(p_de,p_en) for p_de,p_en in phrases if p_en[0] == pos_en[-1]+1 and p_de[0] == pos_de[-1]+1]
             lr_phrase_monotone = [(p_de,p_en) for p_de,p_en in nexts if p_de[0] == pos_de[-1]+1]
@@ -142,13 +146,15 @@ if __name__=='__main__':
             lr_phrase_discontinuous = [t for t in nexts if (t not in lr_phrase_monotone and t not in lr_phrase_swap)]
             n_lr_phrase_discontinuous_l = len([(p_de,p_en) for p_de,p_en in lr_phrase_discontinuous if pos_de[-1] < p_de[0]])
             n_lr_phrase_discontinuous_r = len(lr_phrase_discontinuous) - n_lr_phrase_discontinuous_l
+            n_lr_phrase_discontinuous_r = len(lr_phrase_discontinuous) - n_lr_phrase_discontinuous_l
 
             lr_word_discontinuous = [t for t in nexts if (t not in lr_word_monotone and t not in lr_word_swap)]
             n_lr_word_discontinuous_l = len([(p_de,p_en) for p_de,p_en in lr_word_discontinuous if pos_de[-1] < p_de[0]])
             n_lr_word_discontinuous_r = len(lr_word_discontinuous) - n_lr_word_discontinuous_l
 
             # previous = [(p_de,p_en) for p_de,p_en in phrases if p_en[-1] == pos_en[0]-1] # for r-l
-            previous = phrases_end[pos_en[0]-1] # for r-l
+            # previous = phrases_end[pos_en[0]-1] # for r-l
+            previous = [t for t in phrases_end[pos_en[0]-1] if pos_de[0] not in t[0]] # r-l
 
             # rl_phrase_monotone = [(p_de,p_en) for p_de,p_en in phrases if p_en[-1] == pos_en[0]-1 and p_de[-1] == pos_de[0]-1]
             rl_phrase_monotone = [(p_de,p_en) for p_de,p_en in previous if p_de[-1] == pos_de[0]-1]
