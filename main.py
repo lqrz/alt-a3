@@ -74,10 +74,6 @@ if __name__=='__main__':
     f_out_phrase = codecs.open('phrase_'+output_filepath, 'wb', encoding='utf-8')
     f_out_word = codecs.open('word_'+output_filepath, 'wb', encoding='utf-8')
 
-    # counts = defaultdict(lambda :defaultdict(lambda :defaultdict(int)))
-    # total_lr = Counter()
-    # total_rl = Counter()
-
     counts_phrase_lr_m = Counter()
     counts_phrase_lr_s = Counter()
     counts_phrase_lr_dr = Counter()
@@ -120,23 +116,17 @@ if __name__=='__main__':
         for pos_de, pos_en in phrases:
 
             # get possible next phrase
-            # nexts = [(p_de,p_en) for p_de,p_en in phrases if p_en[0] == pos_en[-1]+1] # for l-r
-            # nexts = phrases_begin[pos_en[-1]+1] # for l-r
             nexts = [t for t in phrases_begin[pos_en[-1]+1] if pos_de[-1] not in t[0]] # for l-r
 
-            # lr_phrase_monotone = [(p_de,p_en) for p_de,p_en in phrases if p_en[0] == pos_en[-1]+1 and p_de[0] == pos_de[-1]+1]
             lr_phrase_monotone = [(p_de,p_en) for p_de,p_en in nexts if p_de[0] == pos_de[-1]+1]
             n_lr_phrase_monotone = len(lr_phrase_monotone)
 
-            # lr_word_monotone = [(p_de,p_en) for p_de,p_en in phrases if p_en[0] == pos_en[-1]+1 and p_en[0] in de_alignment_dict.__getitem__(pos_de[-1]+1)]
             lr_word_monotone = [(p_de,p_en) for p_de,p_en in nexts if p_en[0] in de_alignment_dict.__getitem__(pos_de[-1]+1)]
             n_lr_word_monotone = len(lr_word_monotone)
 
-            # lr_phrase_swap = [(p_de,p_en) for p_de,p_en in phrases if p_en[0] == pos_en[-1]+1 and p_de[-1] == pos_de[0]-1]
             lr_phrase_swap = [(p_de,p_en) for p_de,p_en in nexts if p_de[-1] == pos_de[0]-1]
             n_lr_phrase_swap = len(lr_phrase_swap)
 
-            # lr_word_swap = [(p_de,p_en) for p_de,p_en in phrases if p_en[0] == pos_en[-1]+1 and p_en[0] in de_alignment_dict.__getitem__(pos_de[0]-1)]
             lr_word_swap = [(p_de,p_en) for p_de,p_en in nexts if p_en[0] in de_alignment_dict.__getitem__(pos_de[0]-1)]
             n_lr_word_swap = len(lr_word_swap)
 
@@ -149,23 +139,17 @@ if __name__=='__main__':
             n_lr_word_discontinuous_l = len([(p_de,p_en) for p_de,p_en in lr_word_discontinuous if pos_de[-1] < p_de[0]])
             n_lr_word_discontinuous_r = len(lr_word_discontinuous) - n_lr_word_discontinuous_l
 
-            # previous = [(p_de,p_en) for p_de,p_en in phrases if p_en[-1] == pos_en[0]-1] # for r-l
-            # previous = phrases_end[pos_en[0]-1] # for r-l
             previous = [t for t in phrases_end[pos_en[0]-1] if pos_de[0] not in t[0]] # r-l
 
-            # rl_phrase_monotone = [(p_de,p_en) for p_de,p_en in phrases if p_en[-1] == pos_en[0]-1 and p_de[-1] == pos_de[0]-1]
             rl_phrase_monotone = [(p_de,p_en) for p_de,p_en in previous if p_de[-1] == pos_de[0]-1]
             n_rl_phrase_monotone = len(rl_phrase_monotone)
 
-            # rl_word_monotone = [(p_de,p_en) for p_de,p_en in phrases if p_en[-1] == pos_en[0]-1 and p_en[-1] in de_alignment_dict.__getitem__(pos_de[0]-1)]
             rl_word_monotone = [(p_de,p_en) for p_de,p_en in previous if p_en[-1] in de_alignment_dict.__getitem__(pos_de[0]-1)]
             n_rl_word_monotone = len(rl_word_monotone)
 
-            # rl_phrase_swap = [(p_de,p_en) for p_de,p_en in phrases if p_en[-1] == pos_en[0]-1 and p_de[0] == pos_de[-1]+1]
             rl_phrase_swap = [(p_de,p_en) for p_de,p_en in previous if p_de[0] == pos_de[-1]+1]
             n_rl_phrase_swap = len(rl_phrase_swap)
 
-            # rl_word_swap = [(p_de,p_en) for p_de,p_en in phrases if p_en[-1] == pos_en[0]-1 and p_en[0] in de_alignment_dict.__getitem__(pos_de[-1]+1)]
             rl_word_swap = [(p_de,p_en) for p_de,p_en in previous if p_en[0] in de_alignment_dict.__getitem__(pos_de[-1]+1)]
             n_rl_word_swap = len(rl_word_swap)
 
@@ -207,39 +191,9 @@ if __name__=='__main__':
 
             total_word_rl[phrase_str] += n_rl_word_monotone + n_rl_word_swap + n_rl_word_discontinuous_r + n_rl_word_discontinuous_l
 
-            # # update counter lr
-            # counts[phrase_str]['lr']['m'] += n_lr_phrase_monotone + n_lr_word_monotone
-            # counts[phrase_str]['lr']['s'] += n_lr_phrase_swap + n_lr_word_swap
-            # counts[phrase_str]['lr']['dr'] += n_lr_phrase_discontinuous_r + n_lr_word_discontinuous_r
-            # counts[phrase_str]['lr']['dl'] += n_lr_phrase_discontinuous_l + n_lr_word_discontinuous_l
-            #
-            # total_lr[phrase_str] += (n_lr_phrase_monotone + n_lr_word_monotone + \
-            #                          n_lr_phrase_swap + n_lr_word_swap + \
-            #                          n_lr_phrase_discontinuous_r + n_lr_word_discontinuous_r + \
-            #                          n_lr_phrase_discontinuous_l + n_lr_word_discontinuous_l)
-            #
-            # # update counter rl
-            # counts[phrase_str]['rl']['m'] += n_rl_phrase_monotone + n_rl_word_monotone
-            # counts[phrase_str]['rl']['s'] += n_rl_phrase_swap + n_rl_word_swap
-            # counts[phrase_str]['rl']['dr'] += n_rl_phrase_discontinuous_r + n_rl_word_discontinuous_r
-            # counts[phrase_str]['rl']['dl'] += n_rl_phrase_discontinuous_l + n_rl_word_discontinuous_l
-            #
-            # total_rl[phrase_str] += (n_rl_phrase_monotone + n_rl_word_monotone + \
-            #                          n_rl_phrase_swap + n_rl_word_swap + \
-            #                          n_rl_phrase_discontinuous_r + n_rl_word_discontinuous_r + \
-            #                          n_rl_phrase_discontinuous_l + n_rl_word_discontinuous_l)
-
     print 'Computing probabilities'
     # for phrase in counts.keys():
     for phrase in counts_phrase_lr_m.keys():
-        # p1 = dec(div)(counts[phrase]['lr']['m'], float(total_lr[phrase]))
-        # p2 = dec(div)(counts[phrase]['lr']['s'], float(total_lr[phrase]))
-        # p3 = dec(div)(counts[phrase]['lr']['dl'], float(total_lr[phrase]))
-        # p4 = dec(div)(counts[phrase]['lr']['dr'], float(total_lr[phrase]))
-        # p5 = dec(div)(counts[phrase]['rl']['m'], float(total_rl[phrase]))
-        # p6 = dec(div)(counts[phrase]['rl']['s'], float(total_rl[phrase]))
-        # p7 = dec(div)(counts[phrase]['rl']['dl'], float(total_rl[phrase]))
-        # p8 = dec(div)(counts[phrase]['rl']['dr'], float(total_rl[phrase]))
         p1,p2,p3,p4,p5,p6,p7,p8 = compute_probs(counts_phrase_lr_m, counts_phrase_lr_s, counts_phrase_lr_dl, counts_phrase_lr_dr,
                       counts_phrase_rl_m, counts_phrase_rl_s, counts_phrase_rl_dl, counts_phrase_rl_dr,
                       total_phrase_lr, total_phrase_rl, phrase)
@@ -256,9 +210,6 @@ if __name__=='__main__':
     f_out_word.close()
 
     print 'Pickling structures'
-    # pickle.dump(counts, open('counts.p', 'wb'))
-    # pickle.dump(total_lr, open('total_lr.p', 'wb'))
-    # pickle.dump(total_rl, open('total_rl.p', 'wb'))
     pickle.dump(counts_phrase_lr_m, open('counts_phrase_lr_m.p','wb'))
     pickle.dump(counts_phrase_lr_s, open('counts_phrase_lr_s.p','wb'))
     pickle.dump(counts_phrase_lr_dr, open('counts_phrase_lr_dr.p','wb'))
