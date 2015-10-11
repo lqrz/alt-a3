@@ -71,8 +71,8 @@ if __name__=='__main__':
     f_en = codecs.open(en_filepath, 'rb', encoding='utf-8')
     f_de = codecs.open(de_filepath, 'rb', encoding='utf-8')
     f_align = open(align_filepath, 'rb')
-    f_out_word = codecs.open('word'+output_filepath, 'wb', encoding='utf-8')
-    f_out_phrase = codecs.open('phrase'+output_filepath, 'wb', encoding='utf-8')
+    f_out_phrase = codecs.open('phrase_'+output_filepath, 'wb', encoding='utf-8')
+    f_out_word = codecs.open('word_'+output_filepath, 'wb', encoding='utf-8')
 
     # counts = defaultdict(lambda :defaultdict(lambda :defaultdict(int)))
     # total_lr = Counter()
