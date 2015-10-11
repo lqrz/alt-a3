@@ -117,10 +117,7 @@ if __name__=='__main__':
         line_align = f_align.readline()
         phrases_str, phrases, data_alignments, de_alignment_dict, en_alignment_dict, phrases_begin, phrases_end = extract_phrases(line_en, line_de, line_align, max_phrase_len)
 
-        for i,(pos_de, pos_en) in enumerate(phrases):
-
-            if i == 29:
-                print '29'
+        for pos_de, pos_en in phrases:
 
             # get possible next phrase
             # nexts = [(p_de,p_en) for p_de,p_en in phrases if p_en[0] == pos_en[-1]+1] # for l-r
