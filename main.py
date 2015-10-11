@@ -21,6 +21,30 @@ def dec(f):
     return helper
 
 
+def compute_probs(counts_lr_m, counts_lr_s, counts_lr_dl, counts_lr_dr,
+                      counts_rl_m, counts_rl_s, counts_rl_dl, counts_rl_dr,
+                      total_lr, total_rl, phrase_str):
+
+    p1 = dec(div)(counts_lr_m[phrase_str], float(total_lr[phrase_str]))
+    p2 = dec(div)(counts_lr_s[phrase_str], float(total_lr[phrase_str]))
+    p3 = dec(div)(counts_lr_dl[phrase_str], float(total_lr[phrase_str]))
+    p4 = dec(div)(counts_lr_dr[phrase_str], float(total_lr[phrase_str]))
+    p5 = dec(div)(counts_rl_m[phrase_str], float(total_rl[phrase_str]))
+    p6 = dec(div)(counts_rl_s[phrase_str], float(total_rl[phrase_str]))
+    p7 = dec(div)(counts_rl_dl[phrase_str], float(total_rl[phrase_str]))
+    p8 = dec(div)(counts_rl_dr[phrase_str], float(total_rl[phrase_str]))
+
+    return p1,p2,p3,p4,p5,p6,p7,p8
+
+
+def save_to_file(f_out,p1,p2,p3,p4,p5,p6,p7,p8,phrase):
+    sep = '|||'
+    probs_str = map(str, [p1, p2, p3, p4, p5, p6, p7, p8])
+    f_out.write(' '.join([phrase[0], sep, phrase[1], sep] + probs_str + ['\n']))
+
+    return True
+
+
 if __name__=='__main__':
 
     start = time.time()
@@ -47,12 +71,40 @@ if __name__=='__main__':
     f_en = codecs.open(en_filepath, 'rb', encoding='utf-8')
     f_de = codecs.open(de_filepath, 'rb', encoding='utf-8')
     f_align = open(align_filepath, 'rb')
-    f_out = codecs.open(output_filepath, 'wb', encoding='utf-8')
+    f_out_word = codecs.open('word'+output_filepath, 'wb', encoding='utf-8')
+    f_out_phrase = codecs.open('phrase'+output_filepath, 'wb', encoding='utf-8')
 
-    #TODO: instantiate counters
-    counts = defaultdict(lambda :defaultdict(lambda :defaultdict(int)))
-    total_lr = Counter()
-    total_rl = Counter()
+    # counts = defaultdict(lambda :defaultdict(lambda :defaultdict(int)))
+    # total_lr = Counter()
+    # total_rl = Counter()
+
+    counts_phrase_lr_m = Counter()
+    counts_phrase_lr_s = Counter()
+    counts_phrase_lr_dr = Counter()
+    counts_phrase_lr_dl = Counter()
+
+    total_phrase_lr = Counter()
+
+    counts_word_lr_m = Counter()
+    counts_word_lr_s = Counter()
+    counts_word_lr_dr = Counter()
+    counts_word_lr_dl = Counter()
+
+    total_word_lr = Counter()
+
+    counts_phrase_rl_m = Counter()
+    counts_phrase_rl_s = Counter()
+    counts_phrase_rl_dr = Counter()
+    counts_phrase_rl_dl = Counter()
+
+    total_phrase_rl = Counter()
+
+    counts_word_rl_m = Counter()
+    counts_word_rl_s = Counter()
+    counts_word_rl_dr = Counter()
+    counts_word_rl_dl = Counter()
+
+    total_word_rl = Counter()
 
     print 'Iterating sentences'
     # iterate sentences
@@ -124,49 +176,105 @@ if __name__=='__main__':
 
             phrase_str = alignments2Words((pos_de, pos_en), line_de.strip().split(), line_en.strip().split())
 
-            # update counter lr
-            counts[phrase_str]['lr']['m'] += n_lr_phrase_monotone + n_lr_word_monotone
-            counts[phrase_str]['lr']['s'] += n_lr_phrase_swap + n_lr_word_swap
-            counts[phrase_str]['lr']['dr'] += n_lr_phrase_discontinuous_r + n_lr_word_discontinuous_r
-            counts[phrase_str]['lr']['dl'] += n_lr_phrase_discontinuous_l + n_lr_word_discontinuous_l
+            counts_phrase_lr_m[phrase_str] += n_lr_phrase_monotone
+            counts_phrase_lr_s[phrase_str] += n_lr_phrase_swap
+            counts_phrase_lr_dr[phrase_str] += n_lr_phrase_discontinuous_r
+            counts_phrase_lr_dl[phrase_str] += n_lr_phrase_discontinuous_l
 
-            total_lr[phrase_str] += (n_lr_phrase_monotone + n_lr_word_monotone + \
-                                     n_lr_phrase_swap + n_lr_word_swap + \
-                                     n_lr_phrase_discontinuous_r + n_lr_word_discontinuous_r + \
-                                     n_lr_phrase_discontinuous_l + n_lr_word_discontinuous_l)
+            total_phrase_lr[phrase_str] += n_lr_phrase_monotone + n_lr_phrase_swap + n_lr_phrase_discontinuous_r + n_lr_phrase_discontinuous_l
 
-            # update counter rl
-            counts[phrase_str]['rl']['m'] += n_rl_phrase_monotone + n_rl_word_monotone
-            counts[phrase_str]['rl']['s'] += n_rl_phrase_swap + n_rl_word_swap
-            counts[phrase_str]['rl']['dr'] += n_rl_phrase_discontinuous_r + n_rl_word_discontinuous_r
-            counts[phrase_str]['rl']['dl'] += n_rl_phrase_discontinuous_l + n_rl_word_discontinuous_l
+            counts_word_lr_m[phrase_str] += n_lr_word_monotone
+            counts_word_lr_s[phrase_str] += n_lr_word_swap
+            counts_word_lr_dr[phrase_str] += n_lr_word_discontinuous_r
+            counts_word_lr_dl[phrase_str] += n_lr_word_discontinuous_l
 
-            total_rl[phrase_str] += (n_rl_phrase_monotone + n_rl_word_monotone + \
-                                     n_rl_phrase_swap + n_rl_word_swap + \
-                                     n_rl_phrase_discontinuous_r + n_rl_word_discontinuous_r + \
-                                     n_rl_phrase_discontinuous_l + n_rl_word_discontinuous_l)
+            total_word_lr[phrase_str] += n_lr_word_monotone + n_lr_word_swap + n_lr_word_discontinuous_r + n_lr_word_discontinuous_l
+
+            counts_phrase_rl_m[phrase_str] += n_rl_phrase_monotone
+            counts_phrase_rl_s[phrase_str] += n_rl_phrase_swap
+            counts_phrase_rl_dr[phrase_str] += n_rl_phrase_discontinuous_r
+            counts_phrase_rl_dl[phrase_str] += n_rl_phrase_discontinuous_l
+
+            total_phrase_rl[phrase_str] += n_rl_phrase_monotone + n_rl_phrase_swap + n_rl_phrase_discontinuous_r + n_rl_phrase_discontinuous_l
+
+            counts_word_rl_m[phrase_str] += n_rl_word_monotone
+            counts_word_rl_s[phrase_str] += n_rl_word_swap
+            counts_word_rl_dr[phrase_str] += n_rl_word_discontinuous_r
+            counts_word_rl_dl[phrase_str] += n_rl_word_discontinuous_l
+
+            total_word_rl[phrase_str] += n_rl_word_monotone + n_rl_word_swap + n_rl_word_discontinuous_r + n_rl_word_discontinuous_l
+
+            # # update counter lr
+            # counts[phrase_str]['lr']['m'] += n_lr_phrase_monotone + n_lr_word_monotone
+            # counts[phrase_str]['lr']['s'] += n_lr_phrase_swap + n_lr_word_swap
+            # counts[phrase_str]['lr']['dr'] += n_lr_phrase_discontinuous_r + n_lr_word_discontinuous_r
+            # counts[phrase_str]['lr']['dl'] += n_lr_phrase_discontinuous_l + n_lr_word_discontinuous_l
+            #
+            # total_lr[phrase_str] += (n_lr_phrase_monotone + n_lr_word_monotone + \
+            #                          n_lr_phrase_swap + n_lr_word_swap + \
+            #                          n_lr_phrase_discontinuous_r + n_lr_word_discontinuous_r + \
+            #                          n_lr_phrase_discontinuous_l + n_lr_word_discontinuous_l)
+            #
+            # # update counter rl
+            # counts[phrase_str]['rl']['m'] += n_rl_phrase_monotone + n_rl_word_monotone
+            # counts[phrase_str]['rl']['s'] += n_rl_phrase_swap + n_rl_word_swap
+            # counts[phrase_str]['rl']['dr'] += n_rl_phrase_discontinuous_r + n_rl_word_discontinuous_r
+            # counts[phrase_str]['rl']['dl'] += n_rl_phrase_discontinuous_l + n_rl_word_discontinuous_l
+            #
+            # total_rl[phrase_str] += (n_rl_phrase_monotone + n_rl_word_monotone + \
+            #                          n_rl_phrase_swap + n_rl_word_swap + \
+            #                          n_rl_phrase_discontinuous_r + n_rl_word_discontinuous_r + \
+            #                          n_rl_phrase_discontinuous_l + n_rl_word_discontinuous_l)
 
     print 'Computing probabilities'
-    sep = '|||'
-    for phrase in counts.keys():
-        p1 = dec(div)(counts[phrase]['lr']['m'], float(total_lr[phrase]))
-        p2 = dec(div)(counts[phrase]['lr']['s'], float(total_lr[phrase]))
-        p3 = dec(div)(counts[phrase]['lr']['dl'], float(total_lr[phrase]))
-        p4 = dec(div)(counts[phrase]['lr']['dr'], float(total_lr[phrase]))
-        p5 = dec(div)(counts[phrase]['rl']['m'], float(total_rl[phrase]))
-        p6 = dec(div)(counts[phrase]['rl']['s'], float(total_rl[phrase]))
-        p7 = dec(div)(counts[phrase]['rl']['dl'], float(total_rl[phrase]))
-        p8 = dec(div)(counts[phrase]['rl']['dr'], float(total_rl[phrase]))
+    # for phrase in counts.keys():
+    for phrase in counts_phrase_lr_m.keys():
+        # p1 = dec(div)(counts[phrase]['lr']['m'], float(total_lr[phrase]))
+        # p2 = dec(div)(counts[phrase]['lr']['s'], float(total_lr[phrase]))
+        # p3 = dec(div)(counts[phrase]['lr']['dl'], float(total_lr[phrase]))
+        # p4 = dec(div)(counts[phrase]['lr']['dr'], float(total_lr[phrase]))
+        # p5 = dec(div)(counts[phrase]['rl']['m'], float(total_rl[phrase]))
+        # p6 = dec(div)(counts[phrase]['rl']['s'], float(total_rl[phrase]))
+        # p7 = dec(div)(counts[phrase]['rl']['dl'], float(total_rl[phrase]))
+        # p8 = dec(div)(counts[phrase]['rl']['dr'], float(total_rl[phrase]))
+        p1,p2,p3,p4,p5,p6,p7,p8 = compute_probs(counts_phrase_lr_m, counts_phrase_lr_s, counts_phrase_lr_dl, counts_phrase_lr_dr,
+                      counts_phrase_rl_m, counts_phrase_rl_s, counts_phrase_rl_dl, counts_phrase_rl_dr,
+                      total_phrase_lr, total_phrase_rl, phrase)
 
-        probs_str = map(str,[p1,p2,p3,p4,p5,p6,p7,p8])
+        save_to_file(f_out_phrase,p1,p2,p3,p4,p5,p6,p7,p8,phrase)
 
-        f_out.write(' '.join([phrase[0],sep,phrase[1],sep]+probs_str+['\n']))
+        p1,p2,p3,p4,p5,p6,p7,p8 = compute_probs(counts_word_lr_m, counts_word_lr_s, counts_word_lr_dl, counts_word_lr_dr,
+                      counts_word_rl_m, counts_word_rl_s, counts_word_rl_dl, counts_word_rl_dr,
+                      total_word_lr, total_word_rl, phrase)
 
-    f_out.close()
+        save_to_file(f_out_word,p1,p2,p3,p4,p5,p6,p7,p8,phrase)
+
+    f_out_phrase.close()
+    f_out_word.close()
 
     print 'Pickling structures'
     # pickle.dump(counts, open('counts.p', 'wb'))
-    pickle.dump(total_lr, open('total_lr.p', 'wb'))
-    pickle.dump(total_rl, open('total_rl.p', 'wb'))
+    # pickle.dump(total_lr, open('total_lr.p', 'wb'))
+    # pickle.dump(total_rl, open('total_rl.p', 'wb'))
+    pickle.dump(counts_phrase_lr_m, open('counts_phrase_lr_m.p','wb'))
+    pickle.dump(counts_phrase_lr_s, open('counts_phrase_lr_s.p','wb'))
+    pickle.dump(counts_phrase_lr_dr, open('counts_phrase_lr_dr.p','wb'))
+    pickle.dump(counts_phrase_lr_dl, open('counts_phrase_lr_dl.p','wb'))
+    pickle.dump(counts_word_lr_m, open('counts_word_lr_m.p','wb'))
+    pickle.dump(counts_word_lr_s, open('counts_word_lr_s.p','wb'))
+    pickle.dump(counts_word_lr_dr, open('counts_word_lr_dr.p','wb'))
+    pickle.dump(counts_word_lr_dl, open('counts_word_lr_dl.p','wb'))
+    pickle.dump(counts_phrase_rl_m, open('counts_phrase_rl_m.p','wb'))
+    pickle.dump(counts_phrase_rl_s, open('counts_phrase_rl_s.p','wb'))
+    pickle.dump(counts_phrase_rl_dr, open('counts_phrase_rl_dr.p','wb'))
+    pickle.dump(counts_phrase_rl_dl, open('counts_phrase_rl_dl.p','wb'))
+    pickle.dump(counts_word_rl_m, open('counts_word_rl_m.p','wb'))
+    pickle.dump(counts_word_rl_s, open('counts_word_rl_s.p','wb'))
+    pickle.dump(counts_word_rl_dr, open('counts_word_rl_dr.p','wb'))
+    pickle.dump(counts_word_rl_dl, open('counts_word_rl_dl.p','wb'))
+    pickle.dump(total_phrase_lr, open('total_phrase_lr.p','wb'))
+    pickle.dump(total_word_lr, open('total_word_lr.p','wb'))
+    pickle.dump(total_phrase_rl, open('total_phrase_rl.p','wb'))
+    pickle.dump(total_word_rl, open('total_word_rl.p','wb'))
 
     print 'Elapsed time: ', time.time()-start
