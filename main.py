@@ -102,6 +102,11 @@ if __name__=='__main__':
 
     total_word_rl = Counter()
 
+    phrase_discont_distance_lr_l = []
+    phrase_discont_distance_lr_r = []
+    phrase_discont_distance_rl_l = []
+    phrase_discont_distance_rl_r = []
+
     print 'Iterating sentences'
     # iterate sentences
     start_sent = time.time()
@@ -133,16 +138,19 @@ if __name__=='__main__':
             n_lr_word_swap = int(p_en[0] in de_alignment_dict.__getitem__(pos_de[0]-1))
 
             lr_phrase_discontinuous = [t for t in nexts if (t not in lr_phrase_monotone and t not in lr_phrase_swap)]
-            n_lr_phrase_discontinuous_l = len([(p_de,p_en) for p_de,p_en in lr_phrase_discontinuous if pos_de[-1] < p_de[0]])
+            n_lr_phrase_discontinuous_l = len([(p_de,p_en) for p_de,p_en in lr_phrase_discontinuous if pos_de[0] > p_de[-1]])
             n_lr_phrase_discontinuous_r = len(lr_phrase_discontinuous) - n_lr_phrase_discontinuous_l
-            n_lr_phrase_discontinuous_r = len(lr_phrase_discontinuous) - n_lr_phrase_discontinuous_l
+
+            # stats
+            phrase_discont_distance_lr_l.extend([pos_de[0] - p_de[-1] -1 for p_de,p_en in lr_phrase_discontinuous if pos_de[0] > p_de[-1]])
+            phrase_discont_distance_lr_r.extend([p_de[0] - pos_de[-1] -1 for p_de,p_en in lr_phrase_discontinuous if pos_de[-1] < p_de[0]])
 
             # lr_word_discontinuous = [t for t in nexts if (t not in lr_word_monotone and t not in lr_word_swap)]
             # n_lr_word_discontinuous_l = len([(p_de,p_en) for p_de,p_en in lr_word_discontinuous if pos_de[-1] < p_de[0]])
             # n_lr_word_discontinuous_r = len(lr_word_discontinuous) - n_lr_word_discontinuous_l
             en_al = en_alignment_dict.__getitem__(pos_en[-1] + 1)
-            n_lr_word_discontinuous_l = int(en_al > pos_de[-1]) if en_al else 0
-            n_lr_word_discontinuous_r = int(en_al < pos_de[-1]) if en_al else 0
+            n_lr_word_discontinuous_r = int(any([x > pos_de[-1] for x in en_al]))
+            n_lr_word_discontinuous_l = int(any([x < pos_de[0] for x in en_al]))
 
             previous = [t for t in phrases_end[pos_en[0]-1] if pos_de[0] not in t[0]] # r-l
 
@@ -164,13 +172,18 @@ if __name__=='__main__':
             n_rl_phrase_discontinuous_l = len([(p_de,p_en) for p_de,p_en in rl_phrase_discontinuous if pos_de[0] > p_de[-1]])
             n_rl_phrase_discontinuous_r = len(rl_phrase_discontinuous) - n_rl_phrase_discontinuous_l
 
+            phrase_discont_distance_rl_l.extend([pos_de[0]-p_de[-1]-1 for p_de,p_en in rl_phrase_discontinuous if pos_de[0] > p_de[-1]])
+            phrase_discont_distance_rl_r.extend([p_de[0]-pos_de[0]-1 for p_de,p_en in rl_phrase_discontinuous if pos_de[-1] < p_de[0]])
+
             # rl_word_discontinuous = [t for t in previous if (t not in rl_word_monotone and t not in rl_word_swap)]
             # n_rl_word_discontinuous_l = len([(p_de,p_en) for p_de,p_en in rl_word_discontinuous if pos_de[0] > p_de[-1]])
             # n_rl_word_discontinuous_r = len(rl_word_discontinuous) - n_rl_word_discontinuous_l
 
             en_al = en_alignment_dict.__getitem__(pos_en[0]-1)
-            n_rl_word_discontinuous_l = int(en_al < pos_de[0]) if en_al else 0
-            n_rl_word_discontinuous_r = int(en_al > pos_de[-1]) if en_al else 0
+            # n_rl_word_discontinuous_l = int(en_al < pos_de[0]) if en_al else 0
+            # n_rl_word_discontinuous_r = int(en_al > pos_de[-1]) if en_al else 0
+            n_rl_word_discontinuous_l = int(any([x < pos_de[0] for x in en_al]))
+            n_rl_word_discontinuous_r = int(any([x > pos_de[-1] for x in en_al]))
 
             phrase_str = alignments2Words((pos_de, pos_en), line_de.strip().split(), line_en.strip().split())
 
@@ -241,5 +254,9 @@ if __name__=='__main__':
     pickle.dump(total_word_lr, open('total_word_lr.p','wb'))
     pickle.dump(total_phrase_rl, open('total_phrase_rl.p','wb'))
     pickle.dump(total_word_rl, open('total_word_rl.p','wb'))
+    pickle.dump(phrase_discont_distance_lr_l, open('phrase_discont_distance_lr_l.p','wb'))
+    pickle.dump(phrase_discont_distance_lr_r, open('phrase_discont_distance_lr_r.p','wb'))
+    pickle.dump(phrase_discont_distance_rl_l, open('phrase_discont_distance_rl_l.p','wb'))
+    pickle.dump(phrase_discont_distance_rl_r, open('phrase_discont_distance_rl_r.p','wb'))
 
     print 'Elapsed time: ', time.time()-start
