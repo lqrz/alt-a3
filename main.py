@@ -65,7 +65,7 @@ if __name__=='__main__':
         exit()
 
     # max phrase length
-    max_phrase_len = 10
+    max_phrase_len = 7
 
     # file objects
     f_en = codecs.open(en_filepath, 'rb', encoding='utf-8')
@@ -146,9 +146,9 @@ if __name__=='__main__':
             n_lr_phrase_discontinuous_l = len([(p_de,p_en) for p_de,p_en in lr_phrase_discontinuous if pos_de[0] > p_de[-1]])
             n_lr_phrase_discontinuous_r = len(lr_phrase_discontinuous) - n_lr_phrase_discontinuous_l
 
-            #TODO: remove
-            if 4 in [p_de[0] - pos_de[-1] -1 for p_de,p_en in lr_phrase_discontinuous if pos_de[-1] < p_de[0]]:
-                print 'stop'
+            # #TODO: remove
+            # if 4 in [p_de[0] - pos_de[-1] -1 for p_de,p_en in lr_phrase_discontinuous if pos_de[-1] < p_de[0]]:
+            #     print 'stop'
 
             # stats
             phrase_discont_distance_lr_l.extend([pos_de[0] - p_de[-1] -1 for p_de,p_en in lr_phrase_discontinuous if pos_de[0] > p_de[-1]])
