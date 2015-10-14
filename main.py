@@ -65,7 +65,7 @@ if __name__=='__main__':
         exit()
 
     # max phrase length
-    max_phrase_len = 7
+    max_phrase_len = 10
 
     # file objects
     f_en = codecs.open(en_filepath, 'rb', encoding='utf-8')
@@ -107,6 +107,11 @@ if __name__=='__main__':
     phrase_discont_distance_rl_l = []
     phrase_discont_distance_rl_r = []
 
+    word_discont_distance_lr_l = []
+    word_discont_distance_lr_r = []
+    word_discont_distance_rl_l = []
+    word_discont_distance_rl_r = []
+
     print 'Iterating sentences'
     # iterate sentences
     start_sent = time.time()
@@ -141,6 +146,10 @@ if __name__=='__main__':
             n_lr_phrase_discontinuous_l = len([(p_de,p_en) for p_de,p_en in lr_phrase_discontinuous if pos_de[0] > p_de[-1]])
             n_lr_phrase_discontinuous_r = len(lr_phrase_discontinuous) - n_lr_phrase_discontinuous_l
 
+            #TODO: remove
+            if 4 in [p_de[0] - pos_de[-1] -1 for p_de,p_en in lr_phrase_discontinuous if pos_de[-1] < p_de[0]]:
+                print 'stop'
+
             # stats
             phrase_discont_distance_lr_l.extend([pos_de[0] - p_de[-1] -1 for p_de,p_en in lr_phrase_discontinuous if pos_de[0] > p_de[-1]])
             phrase_discont_distance_lr_r.extend([p_de[0] - pos_de[-1] -1 for p_de,p_en in lr_phrase_discontinuous if pos_de[-1] < p_de[0]])
@@ -151,6 +160,12 @@ if __name__=='__main__':
             en_al = en_alignment_dict.__getitem__(pos_en[-1] + 1)
             n_lr_word_discontinuous_r = int(any([x > pos_de[-1] for x in en_al]))
             n_lr_word_discontinuous_l = int(any([x < pos_de[0] for x in en_al]))
+
+            #stats
+            if [x - pos_de[-1] -1 for x in en_al if x > pos_de[-1]]:
+                word_discont_distance_lr_r.append(min([x - pos_de[-1] -1 for x in en_al if x > pos_de[-1]]))
+            if [pos_de[0] - x -1 for x in en_al if pos_de[0] > x]:
+                word_discont_distance_lr_l.append(min([pos_de[0] - x -1 for x in en_al if pos_de[0] > x]))
 
             previous = [t for t in phrases_end[pos_en[0]-1] if pos_de[0] not in t[0]] # r-l
 
@@ -184,6 +199,12 @@ if __name__=='__main__':
             # n_rl_word_discontinuous_r = int(en_al > pos_de[-1]) if en_al else 0
             n_rl_word_discontinuous_l = int(any([x < pos_de[0] for x in en_al]))
             n_rl_word_discontinuous_r = int(any([x > pos_de[-1] for x in en_al]))
+
+            #stats
+            if [pos_de[0]-x-1 for x in en_al if pos_de[0] > x]:
+                word_discont_distance_rl_r.append(min([pos_de[0]-x-1 for x in en_al if pos_de[0] > x]))
+            if [x-pos_de[-1]-1 for x in en_al if x > pos_de[-1]]:
+                word_discont_distance_rl_l.append(min([x-pos_de[-1]-1 for x in en_al if x > pos_de[-1]]))
 
             phrase_str = alignments2Words((pos_de, pos_en), line_de.strip().split(), line_en.strip().split())
 
@@ -258,5 +279,10 @@ if __name__=='__main__':
     pickle.dump(phrase_discont_distance_lr_r, open('phrase_discont_distance_lr_r.p','wb'))
     pickle.dump(phrase_discont_distance_rl_l, open('phrase_discont_distance_rl_l.p','wb'))
     pickle.dump(phrase_discont_distance_rl_r, open('phrase_discont_distance_rl_r.p','wb'))
+
+    pickle.dump(word_discont_distance_rl_r, open('word_discont_distance_rl_r.p','wb'))
+    pickle.dump(word_discont_distance_rl_l, open('word_discont_distance_rl_l.p','wb'))
+    pickle.dump(word_discont_distance_lr_r, open('word_discont_distance_lr_r.p','wb'))
+    pickle.dump(word_discont_distance_lr_l, open('word_discont_distance_lr_l.p','wb'))
 
     print 'Elapsed time: ', time.time()-start
