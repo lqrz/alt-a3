@@ -166,9 +166,9 @@ if __name__=='__main__':
             n_lr_word_discontinuous_l = int(any([x < pos_de[0]-2 for x in en_al]))
 
             #stats
-            if any([x > pos_de[-1]+1 for x in en_al]):
+            if any([x > pos_de[-1]+2 for x in en_al]):
                 word_discont_distance_lr_r.append(min([x - pos_de[-1] -1 for x in en_al if x > pos_de[-1]+2]))
-            if any([x < pos_de[0]-1 for x in en_al]):
+            if any([x < pos_de[0]-2 for x in en_al]):
                 word_discont_distance_lr_l.append(min([pos_de[0] - x -1 for x in en_al if pos_de[0]-2 > x]))
 
             previous = [t for t in phrases_end[pos_en[0]-1] if pos_de[0] not in t[0]] # r-l
@@ -205,9 +205,9 @@ if __name__=='__main__':
             n_rl_word_discontinuous_l = int(any([x > pos_de[-1]+2 for x in en_al]))
 
             #stats
-            if any([x < pos_de[0]-1 for x in en_al]):
+            if any([x < pos_de[0]-2 for x in en_al]):
                 word_discont_distance_rl_r.append(min([pos_de[0]-x-1 for x in en_al if pos_de[0]-2 > x]))
-            if any([x > pos_de[-1]+1 for x in en_al]):
+            if any([x > pos_de[-1]+2 for x in en_al]):
                 word_discont_distance_rl_l.append(min([x-pos_de[-1]-1 for x in en_al if x > pos_de[-1]+2]))
 
             phrase_str = alignments2Words((pos_de, pos_en), line_de.strip().split(), line_en.strip().split())
