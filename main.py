@@ -161,15 +161,21 @@ if __name__=='__main__':
             # lr_word_discontinuous = [t for t in nexts if (t not in lr_word_monotone and t not in lr_word_swap)]
             # n_lr_word_discontinuous_l = len([(p_de,p_en) for p_de,p_en in lr_word_discontinuous if pos_de[-1] < p_de[0]])
             # n_lr_word_discontinuous_r = len(lr_word_discontinuous) - n_lr_word_discontinuous_l
-            en_al = en_alignment_dict.__getitem__(pos_en[-1] + 1)
-            n_lr_word_discontinuous_r = int(any([x > pos_de[-1]+2 for x in en_al]))
-            n_lr_word_discontinuous_l = int(any([x < pos_de[0]-2 for x in en_al]))
+            de_al = en_alignment_dict.__getitem__(pos_en[-1] + 1)   # german indices
+            monotone = pos_de[-1]+1 in de_al
+            swap = pos_de[0]-1 in de_al
+            if monotone or swap:
+                n_lr_word_discontinuous_r = 0
+                n_lr_word_discontinuous_l = 0
+            else:
+                n_lr_word_discontinuous_r = int(any([x > pos_de[-1]+1 for x in de_al]))
+                n_lr_word_discontinuous_l = int(any([x < pos_de[0]-1 for x in de_al]))
 
             #stats
-            if any([x > pos_de[-1]+2 for x in en_al]):
-                word_discont_distance_lr_r.append(min([x - pos_de[-1] -1 for x in en_al if x > pos_de[-1]+2]))
-            if any([x < pos_de[0]-2 for x in en_al]):
-                word_discont_distance_lr_l.append(min([pos_de[0] - x -1 for x in en_al if pos_de[0]-2 > x]))
+            if not monotone and not swap and any([x > pos_de[-1]+1 for x in de_al]):
+                word_discont_distance_lr_r.append(min([x - pos_de[-1] -1 for x in de_al if x > pos_de[-1]+1]))
+            if not monotone and not swap and any([x < pos_de[0]-1 for x in de_al]):
+                word_discont_distance_lr_l.append(min([pos_de[0] - x -1 for x in de_al if pos_de[0]-1 > x]))
 
             previous = [t for t in phrases_end[pos_en[0]-1] if pos_de[0] not in t[0]] # r-l
 
@@ -198,17 +204,21 @@ if __name__=='__main__':
             # n_rl_word_discontinuous_l = len([(p_de,p_en) for p_de,p_en in rl_word_discontinuous if pos_de[0] > p_de[-1]])
             # n_rl_word_discontinuous_r = len(rl_word_discontinuous) - n_rl_word_discontinuous_l
 
-            en_al = en_alignment_dict.__getitem__(pos_en[0]-1)
-            # n_rl_word_discontinuous_l = int(en_al < pos_de[0]) if en_al else 0
-            # n_rl_word_discontinuous_r = int(en_al > pos_de[-1]) if en_al else 0
-            n_rl_word_discontinuous_r = int(any([x < pos_de[0]-2 for x in en_al]))
-            n_rl_word_discontinuous_l = int(any([x > pos_de[-1]+2 for x in en_al]))
+            de_al = en_alignment_dict.__getitem__(pos_en[0]-1)
+            monotone = pos_de[0]-1 in de_al
+            swap = pos_de[-1]+1 in de_al
+            if monotone or swap:
+                n_rl_word_discontinuous_r = 0
+                n_rl_word_discontinuous_l = 0
+            else:
+                n_rl_word_discontinuous_r = int(any([x < pos_de[0]-1 for x in de_al]))
+                n_rl_word_discontinuous_l = int(any([x > pos_de[-1]+1 for x in de_al]))
 
             #stats
-            if any([x < pos_de[0]-2 for x in en_al]):
-                word_discont_distance_rl_r.append(min([pos_de[0]-x-1 for x in en_al if pos_de[0]-2 > x]))
-            if any([x > pos_de[-1]+2 for x in en_al]):
-                word_discont_distance_rl_l.append(min([x-pos_de[-1]-1 for x in en_al if x > pos_de[-1]+2]))
+            if not monotone and not swap and any([x < pos_de[0]-1 for x in de_al]):
+                word_discont_distance_rl_r.append(min([pos_de[0]-x-1 for x in de_al if pos_de[0]-1 > x]))
+            if not monotone and not swap and any([x > pos_de[-1]+1 for x in de_al]):
+                word_discont_distance_rl_l.append(min([x-pos_de[-1]-1 for x in de_al if x > pos_de[-1]+1]))
 
             phrase_str = alignments2Words((pos_de, pos_en), line_de.strip().split(), line_en.strip().split())
 
@@ -244,7 +254,7 @@ if __name__=='__main__':
             phrase_len_reor_m[german_len] += n_lr_phrase_monotone + n_rl_phrase_monotone
             phrase_len_reor_s[german_len] += n_lr_phrase_swap + n_rl_phrase_swap
             phrase_len_reor_d[german_len] += n_lr_phrase_discontinuous_r + n_lr_phrase_discontinuous_l + \
-                n_rl_phrase_discontinuous_r + n_rl_phrase_discontinuous_l
+                                             n_rl_phrase_discontinuous_r + n_rl_phrase_discontinuous_l
 
     print 'Computing probabilities'
     # for phrase in counts.keys():
