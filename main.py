@@ -135,32 +135,21 @@ if __name__=='__main__':
             lr_phrase_monotone = [(p_de,p_en) for p_de,p_en in nexts if p_de[0] == pos_de[-1]+1]
             n_lr_phrase_monotone = len(lr_phrase_monotone)
 
-            # lr_word_monotone = [(p_de,p_en) for p_de,p_en in nexts if p_en[0] in de_alignment_dict.__getitem__(pos_de[-1]+1)]
-            # n_lr_word_monotone = len(lr_word_monotone)
             n_lr_word_monotone = int(pos_en[-1]+1 in de_alignment_dict.__getitem__(pos_de[-1]+1))
 
             lr_phrase_swap = [(p_de,p_en) for p_de,p_en in nexts if p_de[-1] == pos_de[0]-1]
             n_lr_phrase_swap = len(lr_phrase_swap)
 
-            # lr_word_swap = [(p_de,p_en) for p_de,p_en in nexts if p_en[0] in de_alignment_dict.__getitem__(pos_de[0]-1)]
-            # n_lr_word_swap = len(lr_word_swap)
             n_lr_word_swap = int(pos_en[-1]+1 in de_alignment_dict.__getitem__(pos_de[0]-1))
 
             lr_phrase_discontinuous = [t for t in nexts if (t not in lr_phrase_monotone and t not in lr_phrase_swap)]
             n_lr_phrase_discontinuous_l = len([(p_de,p_en) for p_de,p_en in lr_phrase_discontinuous if pos_de[0] > p_de[-1]])
             n_lr_phrase_discontinuous_r = len(lr_phrase_discontinuous) - n_lr_phrase_discontinuous_l
 
-            # #TODO: remove
-            # if 4 in [p_de[0] - pos_de[-1] -1 for p_de,p_en in lr_phrase_discontinuous if pos_de[-1] < p_de[0]]:
-            #     print 'stop'
-
             # stats
             phrase_discont_distance_lr_l.extend([pos_de[0] - p_de[-1] -1 for p_de,p_en in lr_phrase_discontinuous if pos_de[0] > p_de[-1]])
             phrase_discont_distance_lr_r.extend([p_de[0] - pos_de[-1] -1 for p_de,p_en in lr_phrase_discontinuous if pos_de[-1] < p_de[0]])
 
-            # lr_word_discontinuous = [t for t in nexts if (t not in lr_word_monotone and t not in lr_word_swap)]
-            # n_lr_word_discontinuous_l = len([(p_de,p_en) for p_de,p_en in lr_word_discontinuous if pos_de[-1] < p_de[0]])
-            # n_lr_word_discontinuous_r = len(lr_word_discontinuous) - n_lr_word_discontinuous_l
             de_al = en_alignment_dict.__getitem__(pos_en[-1] + 1)   # german indices
             monotone = pos_de[-1]+1 in de_al
             swap = pos_de[0]-1 in de_al
@@ -182,15 +171,11 @@ if __name__=='__main__':
             rl_phrase_monotone = [(p_de,p_en) for p_de,p_en in previous if p_de[-1] == pos_de[0]-1]
             n_rl_phrase_monotone = len(rl_phrase_monotone)
 
-            # rl_word_monotone = [(p_de,p_en) for p_de,p_en in previous if p_en[-1] in de_alignment_dict.__getitem__(pos_de[0]-1)]
-            # n_rl_word_monotone = len(rl_word_monotone)
             n_rl_word_monotone = int(pos_en[0]-1 in de_alignment_dict.__getitem__(pos_de[0]-1))
 
             rl_phrase_swap = [(p_de,p_en) for p_de,p_en in previous if p_de[0] == pos_de[-1]+1]
             n_rl_phrase_swap = len(rl_phrase_swap)
 
-            # rl_word_swap = [(p_de,p_en) for p_de,p_en in previous if p_en[0] in de_alignment_dict.__getitem__(pos_de[-1]+1)]
-            # n_rl_word_swap = len(rl_word_swap)
             n_rl_word_swap = int(pos_en[0]-1 in de_alignment_dict.__getitem__(pos_de[-1]+1))
 
             rl_phrase_discontinuous = [t for t in previous if (t not in rl_phrase_monotone and t not in rl_phrase_swap)]
@@ -199,10 +184,6 @@ if __name__=='__main__':
 
             phrase_discont_distance_rl_l.extend([p_de[0]-pos_de[-1]-1 for p_de,p_en in rl_phrase_discontinuous if pos_de[-1] < p_de[0]])
             phrase_discont_distance_rl_r.extend([pos_de[0]-p_de[-1]-1 for p_de,p_en in rl_phrase_discontinuous if pos_de[0] > p_de[-1]])
-
-            # rl_word_discontinuous = [t for t in previous if (t not in rl_word_monotone and t not in rl_word_swap)]
-            # n_rl_word_discontinuous_l = len([(p_de,p_en) for p_de,p_en in rl_word_discontinuous if pos_de[0] > p_de[-1]])
-            # n_rl_word_discontinuous_r = len(rl_word_discontinuous) - n_rl_word_discontinuous_l
 
             de_al = en_alignment_dict.__getitem__(pos_en[0]-1)
             monotone = pos_de[0]-1 in de_al
@@ -311,6 +292,7 @@ if __name__=='__main__':
 
     print 'Elapsed time: ', time.time()-start
 
+    # these values are used later on for plotting stats
     print sum(counts_phrase_lr_m.values())
     print sum(counts_phrase_lr_s.values())
     print sum(counts_phrase_lr_dr.values())
